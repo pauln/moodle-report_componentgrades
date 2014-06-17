@@ -46,26 +46,26 @@ add_to_log($course->id, "course", "report componentgrades", "report/componentgra
 $filename = $course->shortname . ' - ' . $cm->name . '.xls';
 
 $data = $DB->get_records_sql('SELECT ggf.id AS ggfid, crs.shortname AS course, asg.name AS assignment, gd.name AS guide, ggc.shortname, ggf.score, ggf.remark, ggf.criterionid, rubm.username AS grader, stu.id AS userid, stu.idnumber AS idnumber, stu.firstname, stu.lastname, stu.username AS student, FROM_UNIXTIME(gin.timemodified) AS modified
-FROM mdl_course AS crs
-JOIN mdl_course_modules AS cm ON crs.id = cm.course
-JOIN mdl_assign AS asg ON asg.id = cm.instance
-JOIN mdl_context AS c ON cm.id = c.instanceid
-JOIN mdl_grading_areas AS ga ON c.id=ga.contextid
-JOIN mdl_grading_definitions AS gd ON ga.id = gd.areaid
-JOIN mdl_gradingform_guide_criteria AS ggc ON (ggc.definitionid = gd.id)
-JOIN mdl_grading_instances AS gin ON gin.definitionid = gd.id
-JOIN mdl_assign_grades AS ag ON ag.id = gin.itemid
-JOIN mdl_user AS stu ON stu.id = ag.userid
-JOIN mdl_user AS rubm ON rubm.id = gin.raterid
-JOIN mdl_gradingform_guide_fillings AS ggf ON (ggf.instanceid = gin.id)
+FROM {course} AS crs
+JOIN {course_modules} AS cm ON crs.id = cm.course
+JOIN {assign} AS asg ON asg.id = cm.instance
+JOIN {context} AS c ON cm.id = c.instanceid
+JOIN {grading_areas} AS ga ON c.id=ga.contextid
+JOIN {grading_definitions} AS gd ON ga.id = gd.areaid
+JOIN {gradingform_guide_criteria} AS ggc ON (ggc.definitionid = gd.id)
+JOIN {grading_instances} AS gin ON gin.definitionid = gd.id
+JOIN {assign_grades} AS ag ON ag.id = gin.itemid
+JOIN {user} AS stu ON stu.id = ag.userid
+JOIN {user} AS rubm ON rubm.id = gin.raterid
+JOIN {gradingform_guide_fillings} AS ggf ON (ggf.instanceid = gin.id)
 AND (ggf.criterionid = ggc.id)
 WHERE cm.id = ? AND gin.status = 1
 ORDER BY lastname ASC, firstname ASC, userid ASC, ggc.sortorder ASC, ggc.shortname ASC', array($cm->id));
 
 $students = $DB->get_records_sql('SELECT stu.id AS userid, stu.idnumber AS idnumber, stu.firstname, stu.lastname, stu.username AS student
-    FROM mdl_user AS stu
-    JOIN mdl_user_enrolments ue ON ue.userid = stu.id
-    JOIN mdl_enrol enr ON ue.enrolid = enr.id
+    FROM {user} AS stu
+    JOIN {user_enrolments} ue ON ue.userid = stu.id
+    JOIN {enrol} enr ON ue.enrolid = enr.id
     WHERE enr.courseid = ?
     ORDER BY lastname ASC, firstname ASC, userid ASC', array($course->id));
 
