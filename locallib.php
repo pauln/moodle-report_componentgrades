@@ -74,14 +74,23 @@ function report_componentgrades_finish_colheaders($workbook, $sheet, $pos) {
     $sheet->merge_cells(2, 0, 2, $pos);
 }
 
-function report_componentgrades_add_data($sheet, $data, $students, $gradinginfopos, $method) {
+function report_componentgrades_process_data($students, $data) {
+    foreach ($students as $student) {
+        $student->data = array();
+        foreach ($data as $key => $line) {
+            if ($line->userid == $student->userid) {
+                $student->data[$key] = $line;
+                unset($data[$key]);
+            }
+        }
+    }
+    return $students;
+}
+
+function report_componentgrades_add_data($sheet, $students, $gradinginfopos, $method) {
     // Actual data.
     $lastuser = 0;
     $row = 5;
-    $datarow = 0;
-    $keys = array_keys($data);
-    $key = $keys[0];
-    $line = $data[$key];
     foreach ($students as $student) {
         $row++;
         $sheet->write_string($row, 0, $student->firstname);
@@ -90,7 +99,7 @@ function report_componentgrades_add_data($sheet, $data, $students, $gradinginfop
         $sheet->write_string($row, 3, $student->student);
 
         $pos = 4;
-        while($line->userid == $student->userid) {
+        foreach($student->data as $line) {
             $sheet->write_number($row, $pos++, $line->score);
             if ($method == 'rubric') {
                 // Only rubrics have a "definition".
@@ -101,9 +110,6 @@ function report_componentgrades_add_data($sheet, $data, $students, $gradinginfop
                 $sheet->write_string($row, $pos++, $line->grader);
                 $sheet->write_string($row, $pos, $line->modified);
             }
-            $datarow++;
-            $key = $keys[$datarow];
-            $line = $data[$key];
         }
     }
 }

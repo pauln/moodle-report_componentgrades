@@ -98,7 +98,8 @@ foreach($data as $line) {
 $gradinginfopos = $pos;
 report_componentgrades_finish_colheaders($workbook, $sheet, $pos);
 
-report_componentgrades_add_data($sheet, $data, $students, $gradinginfopos, 'guide');
+$students = report_componentgrades_process_data($students, $data);
+report_componentgrades_add_data($sheet, $students, $gradinginfopos, 'guide');
 
 $workbook->close();
 
