@@ -49,7 +49,7 @@ $filename = $course->shortname . ' - ' . $cm->name . '.xls';
 $data = $DB->get_records_sql("SELECT    grf.id AS grfid, crs.shortname AS course, asg.name AS assignment, gd.name AS rubric,
                                         grc.description, grl.definition, grl.score, grf.remark, grf.criterionid, rubm.username AS grader,
                                         stu.id AS userid, stu.idnumber AS idnumber, stu.firstname, stu.lastname, stu.username AS student,
-                                        FROM_UNIXTIME(gin.timemodified) AS modified
+                                        gin.timemodified AS modified
                                 FROM {course} AS crs
                                 JOIN {course_modules} AS cm ON crs.id = cm.course
                                 JOIN {assign} AS asg ON asg.id = cm.instance

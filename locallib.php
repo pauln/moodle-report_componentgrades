@@ -108,7 +108,7 @@ function report_componentgrades_add_data($sheet, $students, $gradinginfopos, $me
             $sheet->write_string($row, $pos++, $line->remark);
             if ($pos === $gradinginfopos) {
                 $sheet->write_string($row, $pos++, $line->grader);
-                $sheet->write_string($row, $pos, $line->modified);
+                $sheet->write_string($row, $pos, userdate($line->modified));
             }
         }
     }
