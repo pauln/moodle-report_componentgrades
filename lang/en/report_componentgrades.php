@@ -27,3 +27,4 @@
 $string['pluginname'] = 'Export Component Grades';
 $string['rubricgrades'] = 'Export Rubric Grades';
 $string['guidegrades'] = 'Export Marking Guide Grades';
+$string['eventreportviewed'] = 'Component Grades exported';

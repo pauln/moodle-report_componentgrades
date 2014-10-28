@@ -42,7 +42,15 @@ $cm = $modinfo->get_cm($modid);
 $modcontext = context_module::instance($cm->id);
 require_capability('mod/assign:grade', $modcontext);
 
-add_to_log($course->id, "course", "report componentgrades", "report/componentgrades/rubric.php?id=$course->id&modid=$cm->id", $cm->id);
+// Trigger event for logging.
+$event = \report_componentgrades\event\report_viewed::create(array(
+    'context' => $modcontext,
+    'other' => array(
+        'gradingmethod' => 'rubric'
+    )
+));
+$event->add_record_snapshot('course_modules', $cm);
+$event->trigger();
 
 $filename = $course->shortname . ' - ' . $cm->name . '.xls';
 
