@@ -92,16 +92,18 @@ $sheet = $workbook->add_worksheet($cm->name);
 report_componentgrades_add_header($workbook, $sheet, $course->fullname, $cm->name, 'rubric', $first->rubric);
 
 $pos = 4;
+$format = $workbook->add_format(array('size'=>12, 'bold'=>1));
+$format2 = $workbook->add_format(array('bold'=>1));
 foreach($data as $line) {
     if ($line->userid !== $first->userid) {
         break;
     }
-    $sheet->write_string(4, $pos, $line->description);
-    $sheet->merge_cells(4, $pos, 4, $pos+2);
-    $sheet->write_string(5, $pos, 'Score');
+    $sheet->write_string(4, $pos, $line->description, $format);
+    $sheet->merge_cells(4, $pos, 4, $pos+2, $format);
+    $sheet->write_string(5, $pos, 'Score', $format2);
     $sheet->set_column($pos, $pos++, 6); // Set column width to 6.
-    $sheet->write_string(5, $pos++, 'Definition');
-    $sheet->write_string(5, $pos, 'Feedback');
+    $sheet->write_string(5, $pos++, 'Definition', $format2);
+    $sheet->write_string(5, $pos, 'Feedback', $format2);
     $sheet->set_column($pos-1, $pos++, 10); // Set column widths to 10.
 }
 
