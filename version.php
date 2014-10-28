@@ -26,8 +26,8 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2014052904;    // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2012112900;    // Requires this Moodle version
-$plugin->release   = '1.0 RC3';
+$plugin->version   = 2014052905;    // The current plugin version (Date: YYYYMMDDXX)
+$plugin->requires  = 2014051200;    // Requires this Moodle version
+$plugin->release   = '1.0 RC3 for Moodle 2.7';
 $plugin->maturity  = MATURITY_RC;
 $plugin->component = 'report_componentgrades';  // Full name of the plugin (used for diagnostics)
