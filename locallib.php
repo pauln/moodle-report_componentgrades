@@ -47,19 +47,19 @@ function report_componentgrades_add_header($workbook, $sheet, $coursename, $modn
     // Column headers - two rows for grouping.
     $sheet->write_string(4, 0, 'Student');
     $sheet->merge_cells(4, 0, 4, 3);
-    $sheet->write_string(5, 0, 'First name');
-    $sheet->write_string(5, 1, 'Last name');
-    $sheet->write_string(5, 2, 'Student ID');
-    $sheet->write_string(5, 3, 'Username');
+    $sheet->write_string(5, 0, get_string('firstname','report_componentgrades'));
+    $sheet->write_string(5, 1, get_string('lastname','report_componentgrades'));
+    $sheet->write_string(5, 2, get_string('studentid','report_componentgrades'));
+    $sheet->write_string(5, 3, get_string('username','report_componentgrades'));
     $sheet->set_column(0, 3, 10); // Set column widths to 10.
 }
 
 function report_componentgrades_finish_colheaders($workbook, $sheet, $pos) {
     // Grading info columns.
-    $sheet->write_string(4, $pos, 'Grading info');
-    $sheet->write_string(5, $pos, 'Graded by');
+    $sheet->write_string(4, $pos, get_string('gradinginfo','report_componentgrades'));
+    $sheet->write_string(5, $pos, get_string('gradedby','report_componentgrades'));
     $sheet->set_column($pos, $pos++, 10); // Set column width to 10.
-    $sheet->write_string(5, $pos, 'Time graded');
+    $sheet->write_string(5, $pos, get_string('timegraded','report_componentgrades'));
     $sheet->set_column($pos, $pos, 17.5); // Set column width to 17.5.
     $sheet->merge_cells(4, $pos-1, 4, $pos);
 
