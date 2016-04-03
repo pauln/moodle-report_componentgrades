@@ -27,3 +27,13 @@
 $string['pluginname'] = 'Export Component Grades';
 $string['rubricgrades'] = 'Export Rubric Grades';
 $string['guidegrades'] = 'Export Marking Guide Grades';
+$string['gradinginfo'] = 'Grading Info';
+$string['gradedby'] = 'Graded by';
+$string['timegraded'] = 'Time graded';
+$string['firstname'] = 'Last name';
+$string['lastname'] = 'Graded by';
+$string['studentid'] = 'Student ID';
+$string['username'] = 'Username';
+$string['score'] = 'Score';
+$string['definition'] = 'Definition';
+$string['feedback'] = 'Feedback';
