@@ -47,12 +47,12 @@ function report_componentgrades_add_header($workbook, $sheet, $coursename, $modn
     // Column headers - two rows for grouping.
     $format = $workbook->add_format(array('size'=>12, 'bold'=>1));
     $format2 = $workbook->add_format(array('bold'=>1));
-    $sheet->write_string(4, 0, 'Student', $format);
+    $sheet->write_string(4, 0, get_string('student','report_componentgrades'), $format);
     $sheet->merge_cells(4, 0, 4, 3, $format);
-    $sheet->write_string(5, 0, 'First name', $format2);
-    $sheet->write_string(5, 1, 'Last name', $format2);
-    $sheet->write_string(5, 2, 'Student ID', $format2);
-    $sheet->write_string(5, 3, 'Username', $format2);
+    $sheet->write_string(5, 0, get_string('firstname','report_componentgrades'), $format2);
+    $sheet->write_string(5, 1, get_string('lastname','report_componentgrades'), $format2);
+    $sheet->write_string(5, 2, get_string('studentid','report_componentgrades'), $format2);
+    $sheet->write_string(5, 3, get_string('username','report_componentgrades'), $format2);
     $sheet->set_column(0, 3, 10); // Set column widths to 10.
 }
 
@@ -60,10 +60,10 @@ function report_componentgrades_finish_colheaders($workbook, $sheet, $pos) {
     // Grading info columns.
     $format = $workbook->add_format(array('size'=>12, 'bold'=>1));
     $format2 = $workbook->add_format(array('bold'=>1));
-    $sheet->write_string(4, $pos, 'Grading info', $format);
-    $sheet->write_string(5, $pos, 'Graded by', $format2);
+    $sheet->write_string(4, $pos, get_string('gradinginfo','report_componentgrades'));
+    $sheet->write_string(5, $pos, get_string('gradedby','report_componentgrades'));
     $sheet->set_column($pos, $pos++, 10); // Set column width to 10.
-    $sheet->write_string(5, $pos, 'Time graded', $format2);
+    $sheet->write_string(5, $pos, get_string('timegraded','report_componentgrades'),$format2);
     $sheet->set_column($pos, $pos, 17.5); // Set column width to 17.5.
     $sheet->merge_cells(4, $pos-1, 4, $pos);
 
@@ -99,7 +99,6 @@ function report_componentgrades_add_data($sheet, $students, $gradinginfopos, $me
         $sheet->write_string($row, 1, $student->lastname);
         $sheet->write_string($row, 2, $student->idnumber);
         $sheet->write_string($row, 3, $student->student);
-
         $pos = 4;
         foreach($student->data as $line) {
             $sheet->write_number($row, $pos++, $line->score);
