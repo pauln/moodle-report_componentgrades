@@ -80,7 +80,7 @@ $students = report_componentgrades_get_students($course->id);
 $first = reset($data);
 if ($first === false) {
     $url = $CFG->wwwroot.'/mod/assign/view.php?id='.$cm->id;
-    $message = get_string('nogradesentered','report_componentgrades');
+    $message = get_string('nogradesenteredrubric','report_componentgrades');
     redirect($url, $message, 5);
     exit;
 }
