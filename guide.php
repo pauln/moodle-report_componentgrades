@@ -43,6 +43,13 @@ $modcontext = context_module::instance($cm->id);
 require_capability('mod/assign:grade', $modcontext);
 
 add_to_log($course->id, "course", "report componentgrades", "report/componentgrades/guide.php?id=$course->id&modid=$cm->id", $cm->id);
+$eventdata = array('other' => array(
+    'coursefullname' => $course->fullname,
+    'courseid' => $course->id,
+    'assignmentname' => $cm->name,
+));
+$event = \report_componentgrades\event\report_componentgrades_executed::create($eventdata);
+$event->trigger();
 
 $filename = $course->shortname . ' - ' . $cm->name . '.xls';
 

@@ -37,3 +37,4 @@ $string['username'] = 'Username';
 $string['score'] = 'Score';
 $string['definition'] = 'Definition';
 $string['feedback'] = 'Feedback';
+$string['eventreportcomponentgradesexecuted'] = 'Event report_componentgrades_executed:';
