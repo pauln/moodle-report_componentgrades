@@ -60,10 +60,10 @@ function report_componentgrades_finish_colheaders($workbook, $sheet, $pos) {
     // Grading info columns.
     $format = $workbook->add_format(array('size'=>12, 'bold'=>1));
     $format2 = $workbook->add_format(array('bold'=>1));
-    $sheet->write_string(4, $pos, get_string('gradinginfo','report_componentgrades'));
-    $sheet->write_string(5, $pos, get_string('gradedby','report_componentgrades'));
+    $sheet->write_string(4, $pos, get_string('gradinginfo','report_componentgrades'), $format);
+    $sheet->write_string(5, $pos, get_string('gradedby','report_componentgrades'), $format2);
     $sheet->set_column($pos, $pos++, 10); // Set column width to 10.
-    $sheet->write_string(5, $pos, get_string('timegraded','report_componentgrades'),$format2);
+    $sheet->write_string(5, $pos, get_string('timegraded','report_componentgrades'), $format2);
     $sheet->set_column($pos, $pos, 17.5); // Set column width to 17.5.
     $sheet->merge_cells(4, $pos-1, 4, $pos);
 
