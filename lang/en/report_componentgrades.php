@@ -27,6 +27,7 @@
 $string['pluginname'] = 'Export Component Grades';
 $string['rubricgrades'] = 'Export Rubric Grades';
 $string['guidegrades'] = 'Export Marking Guide Grades';
+$string['btecgrades'] = 'Export BTEC Grades';
 $string['eventreportviewed'] = 'Component Grades exported';
 $string['gradinginfo'] = 'Grading Info';
 $string['gradedby'] = 'Graded by';
@@ -41,4 +42,5 @@ $string['definition'] = 'Definition';
 $string['feedback'] = 'Feedback';
 $string['nogradesenteredrubric'] = "No grades have been entered into this assignment's rubric.";
 $string['nogradesenteredguide'] = "No grades have been entered into this assignment's marking guide.";
+$string['nobtecgrades'] = "No grades have been entered into this assignment's BTEC marking.";
 
