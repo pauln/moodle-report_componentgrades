@@ -22,10 +22,11 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-function report_componentgrades_get_students($courseid) {
+function report_componentgrades_get_students($courseid)
+{
     global $DB;
-    return $DB->get_records_sql('SELECT stu.id AS userid, stu.idnumber AS idnumber, stu.firstname, stu.lastname, stu.username AS student
-        FROM {user} AS stu
+    return $DB->get_records_sql('SELECT (@id := @id +1) id,stu.id AS userid, stu.idnumber AS idnumber, stu.firstname, stu.lastname, stu.username AS student
+        FROM (select @id := 0) ids, {user} AS stu
         JOIN {user_enrolments} ue ON ue.userid = stu.id
         JOIN {enrol} enr ON ue.enrolid = enr.id
         WHERE enr.courseid = ?
