@@ -35,13 +35,20 @@ function report_componentgrades_extend_navigation_module($navigation, $cm) {
         $gradinginstance = null;
         switch ($gradingmanager->get_active_method()) {
             case 'rubric':
-                $url = new moodle_url('/report/componentgrades/rubric.php', array('id'=>$cm->course,'modid'=>$cm->id));
-                $navigation->add(get_string('rubricgrades', 'report_componentgrades'), $url, navigation_node::TYPE_SETTING, null, 'rubricgrades');
+                $url = new moodle_url('/report/componentgrades/rubric.php', array('id' => $cm->course, 'modid' => $cm->id));
+                $navigation->add(get_string('rubricgrades', 'report_componentgrades'), $url, navigation_node::TYPE_SETTING, null,
+                        'rubricgrades');
                 break;
             case 'guide':
-                $url = new moodle_url('/report/componentgrades/guide.php', array('id'=>$cm->course,'modid'=>$cm->id));
-                $navigation->add(get_string('guidegrades', 'report_componentgrades'), $url, navigation_node::TYPE_SETTING, null, 'guidegrades');
+                $url = new moodle_url('/report/componentgrades/guide.php', array('id' => $cm->course, 'modid' => $cm->id));
+                $navigation->add(get_string('guidegrades', 'report_componentgrades'), $url, navigation_node::TYPE_SETTING, null,
+                        'guidegrades');
                 break;
-            }
+            case 'btec':
+                $url = new moodle_url('/report/componentgrades/btec.php', array('id' => $cm->course, 'modid' => $cm->id));
+                $navigation->add(get_string('btecgrades', 'report_componentgrades'), $url,
+                        navigation_node::TYPE_SETTING, null, 'btecgrades');
+            break;
+        }
     }
 }
