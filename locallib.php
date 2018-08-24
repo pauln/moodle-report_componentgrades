@@ -51,9 +51,11 @@ function report_componentgrades_add_header($workbook, $sheet, $coursename, $modn
     $sheet->merge_cells(4, 0, 4, 3, $format);
     $sheet->write_string(5, 0, get_string('firstname','report_componentgrades'), $format2);
     $sheet->write_string(5, 1, get_string('lastname','report_componentgrades'), $format2);
-    $sheet->write_string(5, 2, get_string('studentid','report_componentgrades'), $format2);
-    $sheet->write_string(5, 3, get_string('username','report_componentgrades'), $format2);
+    $sheet->write_string(5, 2, get_string('username','report_componentgrades'), $format2);
+    $sheet->write_string(5, 3, get_string('studentid','report_componentgrades'), $format2);
     $sheet->set_column(0, 3, 10); // Set column widths to 10.
+    return 4;
+
 }
 
 function report_componentgrades_finish_colheaders($workbook, $sheet, $pos) {
@@ -94,22 +96,40 @@ function report_componentgrades_add_data($sheet, $students, $gradinginfopos, $me
     $lastuser = 0;
     $row = 5;
     foreach ($students as $student) {
+        $col=0;
         $row++;
-        $sheet->write_string($row, 0, $student->firstname);
-        $sheet->write_string($row, 1, $student->lastname);
-        $sheet->write_string($row, 2, $student->idnumber);
-        $sheet->write_string($row, 3, $student->student);
-        $pos = 4;
-        foreach($student->data as $line) {
-            $sheet->write_number($row, $pos++, $line->score);
+        $sheet->write_string($row, $col++, $student->firstname);
+        $sheet->write_string($row, $col++, $student->lastname);
+        $sheet->write_string($row, $col++, $student->student);
+        $sheet->write_string($row, $col++, $student->idnumber);
+        
+        foreach ($student->data as $line) {
+            if (is_numeric($line->score)) {
+                $sheet->write_number($row, $col++, $line->score);
+            } else {
+                /* if BTEC 0=N and 1=Y */
+                $sheet->write_string($row, $col++, $line->score);
+            }
             if ($method == 'rubric') {
                 // Only rubrics have a "definition".
-                $sheet->write_string($row, $pos++, $line->definition);
+                $sheet->write_string($row, $col++, $line->definition);
             }
-            $sheet->write_string($row, $pos++, $line->remark);
-            if ($pos === $gradinginfopos) {
-                $sheet->write_string($row, $pos++, $line->grader);
-                $sheet->write_string($row, $pos, userdate($line->modified));
+            $sheet->write_string($row, $col++, $line->remark);
+            if ($col === $gradinginfopos) {
+                if ($method == 'btec') {
+                    /* Add the overall assignment grade converted to R,P,M,D
+                     * and the feedback given for the overal assignment
+                     */
+                    $sheet->set_column($col, $col, 12);
+                    $sheet->write_string($row, $col++, $line->grade);
+                    /*add the per-criteria feedback */
+                    $sheet->set_column($col, $col, 50);
+                    $sheet->write_string($row, $col++, $line->commenttext);
+                }
+                $sheet->set_column($col, $col, 15);
+                $sheet->write_string($row, $col++, $line->grader);
+                $sheet->set_column($col, $col, 35);
+                $sheet->write_string($row, $col, userdate($line->modified));
             }
         }
     }

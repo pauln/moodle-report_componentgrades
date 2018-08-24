@@ -99,7 +99,6 @@ $workbook->send($filename);
 $sheet = $workbook->add_worksheet($cm->name);
 
 $pos = report_componentgrades_add_header($workbook, $sheet, $course->fullname, $cm->name, 'btec', $first->btec);
-$datacol = $pos;
 $format = $workbook->add_format(array('size' => 12, 'bold' => 1));
 $format2 = $workbook->add_format(array('bold' => 1));
 foreach ($data as $line) {
@@ -123,7 +122,7 @@ $sheet->set_column($pos, $pos, 12);
 $pos++;
 report_componentgrades_finish_colheaders($workbook, $sheet, $pos);
 $students = report_componentgrades_process_data($students, $data);
-report_componentgrades_add_data($sheet, $students, $gradinginfopos, 'btec', $datacol);
+report_componentgrades_add_data($sheet, $students, $gradinginfopos, 'btec');
 
 $workbook->close();
 
