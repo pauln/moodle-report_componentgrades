@@ -26,15 +26,15 @@ require('../../config.php');
 require_once($CFG->dirroot.'/lib/excellib.class.php');
 require_once($CFG->dirroot.'/report/componentgrades/locallib.php');
 
-$id          = required_param('id', PARAM_INT);// Course ID
-$modid       = required_param('modid', PARAM_INT);// CM ID
+$id          = required_param('id', PARAM_INT);// Course ID.
+$modid       = required_param('modid', PARAM_INT);// CM ID.
 
 $params['id'] = $id;
 $params['modid'] = $id;
 
 $PAGE->set_url('/report/componentgrades/index.php', $params);
 
-$course = $DB->get_record('course', array('id'=>$id), '*', MUST_EXIST);
+$course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 require_login($course);
 
 $modinfo = get_fast_modinfo($course->id);
@@ -55,9 +55,9 @@ $event->trigger();
 $filename = $course->shortname . ' - ' . $cm->name . '.xls';
 
 $data = $DB->get_records_sql("SELECT    grf.id AS grfid, crs.shortname AS course, asg.name AS assignment, gd.name AS rubric,
-                                        grc.description, grl.definition, grl.score, grf.remark, grf.criterionid, rubm.username AS grader,
-                                        stu.id AS userid, stu.idnumber AS idnumber, stu.firstname, stu.lastname, stu.username AS student,
-                                        gin.timemodified AS modified
+                                        grc.description, grl.definition, grl.score, grf.remark, grf.criterionid,
+                                        rubm.username AS grader, stu.id AS userid, stu.idnumber AS idnumber, stu.firstname,
+                                        stu.lastname, stu.username AS student, gin.timemodified AS modified
                                 FROM {course} AS crs
                                 JOIN {course_modules} AS cm ON crs.id = cm.course
                                 JOIN {assign} AS asg ON asg.id = cm.instance
@@ -73,14 +73,15 @@ $data = $DB->get_records_sql("SELECT    grf.id AS grfid, crs.shortname AS course
                                 JOIN {gradingform_rubric_fillings} AS grf ON (grf.instanceid = gin.id)
                                 AND (grf.criterionid = grc.id) AND (grf.levelid = grl.id)
                                 WHERE cm.id = ? AND gin.status = 1
-                                ORDER BY lastname ASC, firstname ASC, userid ASC, grc.sortorder ASC, grc.description ASC", array($cm->id));
+                                ORDER BY lastname ASC, firstname ASC, userid ASC, grc.sortorder ASC,
+                                grc.description ASC", array($cm->id));
 
 $students = report_componentgrades_get_students($course->id);
 
 $first = reset($data);
 if ($first === false) {
     $url = $CFG->wwwroot.'/mod/assign/view.php?id='.$cm->id;
-    $message = get_string('nogradesenteredrubric','report_componentgrades');
+    $message = get_string('nogradesenteredrubric', 'report_componentgrades');
     redirect($url, $message, 5);
     exit;
 }
@@ -92,19 +93,19 @@ $sheet = $workbook->add_worksheet($cm->name);
 report_componentgrades_add_header($workbook, $sheet, $course->fullname, $cm->name, 'rubric', $first->rubric);
 
 $pos = 4;
-$format = $workbook->add_format(array('size'=>12, 'bold'=>1));
-$format2 = $workbook->add_format(array('bold'=>1));
-foreach($data as $line) {
+$format = $workbook->add_format(array('size' => 12, 'bold' => 1));
+$format2 = $workbook->add_format(array('bold' => 1));
+foreach ($data as $line) {
     if ($line->userid !== $first->userid) {
         break;
     }
     $sheet->write_string(4, $pos, $line->description, $format);
-    $sheet->merge_cells(4, $pos, 4, $pos+2, $format);
-    $sheet->write_string(5, $pos, get_string('score','report_componentgrades'), $format2);
+    $sheet->merge_cells(4, $pos, 4, $pos + 2, $format);
+    $sheet->write_string(5, $pos, get_string('score', 'report_componentgrades'), $format2);
     $sheet->set_column($pos, $pos++, 6); // Set column width to 6.
-    $sheet->write_string(5, $pos++, get_string('definition','report_componentgrades'), $format2);
-    $sheet->write_string(5, $pos, get_string('feedback','report_componentgrades'), $format2);
-    $sheet->set_column($pos-1, $pos++, 10); // Set column widths to 10.
+    $sheet->write_string(5, $pos++, get_string('definition', 'report_componentgrades'), $format2);
+    $sheet->write_string(5, $pos, get_string('feedback', 'report_componentgrades'), $format2);
+    $sheet->set_column($pos - 1, $pos++, 10); // Set column widths to 10.
 }
 
 $gradinginfopos = $pos;

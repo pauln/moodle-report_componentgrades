@@ -15,6 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ *
+ * Spreadsheet export report for assignments marked with advanced grading methods
+ *
  * @package    report_componentgrades
  * @copyright  2014 Paul Nicholls
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,9 +29,9 @@ defined('MOODLE_INTERNAL') || die;
  * This function extends the module navigation with the report items
  *
  * @param navigation_node $navigation The navigation node to extend
- * @param stdClass $cm
+ * @param cm_info $cm
  */
-function report_componentgrades_extend_navigation_module($navigation, $cm) {
+function report_componentgrades_extend_navigation_module(navigation_node $navigation, cm_info $cm) {
     $context = context_module::instance($cm->id);
     if ($cm->modname == 'assign' && has_capability('moodle/grade:edit', $context)) {
         $gradingmanager = get_grading_manager($context, 'mod_assign', 'submissions');

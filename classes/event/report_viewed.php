@@ -61,7 +61,8 @@ class report_viewed extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' exported the component grades for the assignment with id '$this->contextinstanceid' in the course with id '$this->courseid'.";
+        return "The user with id '$this->userid' exported the component grades for
+         the assignment with id '$this->contextinstanceid' in the course with id '$this->courseid'.";
     }
 
     /**
@@ -70,16 +71,17 @@ class report_viewed extends \core\event\base {
      * @return \moodle_url
      */
     public function get_url() {
-        return new \moodle_url('/report/componentgrades/'.$this->other['gradingmethod'].'.php', array('id' => $this->courseid, 'modid' => $this->contextinstanceid));
+        return new \moodle_url('/report/componentgrades/'.$this->other['gradingmethod'].'.php',
+         array('id' => $this->courseid, 'modid' => $this->contextinstanceid));
     }
 
     /**
-    * Replace add_to_log() statement.
-    *
-    * @return array of parameters to be passed to legacy add_to_log() function.
-    */
+     * Replace add_to_log() statement.
+     *
+     * @return array of parameters to be passed to legacy add_to_log() function.
+     */
     protected function get_legacy_logdata() {
-        return array ($this->courseid, "course", "report componentgrades", $this->get_url(), $this->contextinstanceid);
+        return array($this->courseid, "course", "report componentgrades", $this->get_url(), $this->contextinstanceid);
     }
 
     /**

@@ -56,7 +56,7 @@ $filename = $course->shortname . ' - ' . $cm->name . '.xls';
 $data = $DB->get_records_sql("SELECT gbf.id AS ggfid, crs.shortname AS course, asg.name AS assignment, gd.name AS btec,
                                         gbc.shortname, gbf.score, gbf.remark, gbf.criterionid, marker.username AS grader,
                                         stu.id AS userid, stu.idnumber AS idnumber, stu.firstname, stu.lastname,
-                                        stu.username AS student, gin.timemodified AS modified,ag.id,ag.grade,
+                                        stu.username AS student, gin.timemodified AS modified,ag.id, ag.grade,
                                         afc.commenttext
                                 FROM {course} crs
                                 JOIN {course_modules} cm ON crs.id = cm.course
@@ -67,7 +67,7 @@ $data = $DB->get_records_sql("SELECT gbf.id AS ggfid, crs.shortname AS course, a
                                 JOIN {gradingform_btec_criteria}  gbc ON (gbc.definitionid = gd.id)
                                 JOIN {grading_instances} gin ON gin.definitionid = gd.id
                                 JOIN {assign_grades} ag ON ag.id = gin.itemid
-                                LEFT JOIN {assignfeedback_comments} afc on ag.id=afc.id
+                                JOIN {assignfeedback_comments} afc on ag.id=afc.grade 
                                 JOIN {user} stu ON stu.id = ag.userid
                                 JOIN {user} marker ON marker.id = gin.raterid
                                 JOIN {gradingform_btec_fillings} gbf ON (gbf.instanceid = gin.id)
@@ -127,10 +127,19 @@ report_componentgrades_add_data($sheet, $students, $gradinginfopos, 'btec');
 $workbook->close();
 
 exit;
-
-function num_to_letter($number) {
+/**
+ * Convert numbers 0 to 4 to grades
+ * N for No, R for Refer, P for Pass
+ * M for Merit and D for distinction
+ * Not sure why R is set as default at the top
+ * TODO: fix R, change name to score_to_letter
+ *
+ * @param number $score
+ * @return void
+ */
+function num_to_letter($score) {
     $letter = "R";
-    switch ($number) {
+    switch ($score) {
         case 0;
             $letter = 'N';
             break;
