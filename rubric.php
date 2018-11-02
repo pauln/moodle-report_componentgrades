@@ -58,19 +58,19 @@ $data = $DB->get_records_sql("SELECT    grf.id AS grfid, crs.shortname AS course
                                         grc.description, grl.definition, grl.score, grf.remark, grf.criterionid,
                                         rubm.username AS grader, stu.id AS userid, stu.idnumber AS idnumber, stu.firstname,
                                         stu.lastname, stu.username AS student, gin.timemodified AS modified
-                                FROM {course} AS crs
-                                JOIN {course_modules} AS cm ON crs.id = cm.course
-                                JOIN {assign} AS asg ON asg.id = cm.instance
-                                JOIN {context} AS c ON cm.id = c.instanceid
-                                JOIN {grading_areas} AS ga ON c.id=ga.contextid
-                                JOIN {grading_definitions} AS gd ON ga.id = gd.areaid
-                                JOIN {gradingform_rubric_criteria} AS grc ON (grc.definitionid = gd.id)
-                                JOIN {gradingform_rubric_levels} AS grl ON (grl.criterionid = grc.id)
-                                JOIN {grading_instances} AS gin ON gin.definitionid = gd.id
-                                JOIN {assign_grades} AS ag ON ag.id = gin.itemid
-                                JOIN {user} AS stu ON stu.id = ag.userid
-                                JOIN {user} AS rubm ON rubm.id = gin.raterid
-                                JOIN {gradingform_rubric_fillings} AS grf ON (grf.instanceid = gin.id)
+                                FROM {course} crs
+                                JOIN {course_modules} cm ON crs.id = cm.course
+                                JOIN {assign} asg ON asg.id = cm.instance
+                                JOIN {context} c ON cm.id = c.instanceid
+                                JOIN {grading_areas}  ga ON c.id=ga.contextid
+                                JOIN {grading_definitions} gd ON ga.id = gd.areaid
+                                JOIN {gradingform_rubric_criteria} grc ON (grc.definitionid = gd.id)
+                                JOIN {gradingform_rubric_levels} grl ON (grl.criterionid = grc.id)
+                                JOIN {grading_instances} gin ON gin.definitionid = gd.id
+                                JOIN {assign_grades} ag ON ag.id = gin.itemid
+                                JOIN {user} stu ON stu.id = ag.userid
+                                JOIN {user} rubm ON rubm.id = gin.raterid
+                                JOIN {gradingform_rubric_fillings} grf ON (grf.instanceid = gin.id)
                                 AND (grf.criterionid = grc.id) AND (grf.levelid = grl.id)
                                 WHERE cm.id = ? AND gin.status = 1
                                 ORDER BY lastname ASC, firstname ASC, userid ASC, grc.sortorder ASC,

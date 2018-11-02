@@ -33,7 +33,7 @@ function report_componentgrades_get_students($courseid) {
     global $DB;
     return $DB->get_records_sql('SELECT stu.id AS userid, stu.idnumber AS idnumber,
         stu.firstname, stu.lastname, stu.username AS student
-        FROM {user} AS stu
+        FROM {user} stu
         JOIN {user_enrolments} ue ON ue.userid = stu.id
         JOIN {enrol} enr ON ue.enrolid = enr.id
         WHERE enr.courseid = ?

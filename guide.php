@@ -58,18 +58,18 @@ $data = $DB->get_records_sql("SELECT    ggf.id AS ggfid, crs.shortname AS course
                                         ggc.shortname, ggf.score, ggf.remark, ggf.criterionid, rubm.username AS grader,
                                         stu.id AS userid, stu.idnumber AS idnumber, stu.firstname, stu.lastname,
                                         stu.username AS student, gin.timemodified AS modified
-                                FROM {course} AS crs
-                                JOIN {course_modules} AS cm ON crs.id = cm.course
-                                JOIN {assign} AS asg ON asg.id = cm.instance
-                                JOIN {context} AS c ON cm.id = c.instanceid
-                                JOIN {grading_areas} AS ga ON c.id=ga.contextid
-                                JOIN {grading_definitions} AS gd ON ga.id = gd.areaid
-                                JOIN {gradingform_guide_criteria} AS ggc ON (ggc.definitionid = gd.id)
-                                JOIN {grading_instances} AS gin ON gin.definitionid = gd.id
-                                JOIN {assign_grades} AS ag ON ag.id = gin.itemid
-                                JOIN {user} AS stu ON stu.id = ag.userid
-                                JOIN {user} AS rubm ON rubm.id = gin.raterid
-                                JOIN {gradingform_guide_fillings} AS ggf ON (ggf.instanceid = gin.id)
+                                FROM {course} crs
+                                JOIN {course_modules} cm ON crs.id = cm.course
+                                JOIN {assign} asg ON asg.id = cm.instance
+                                JOIN {context} c ON cm.id = c.instanceid
+                                JOIN {grading_areas} ga ON c.id=ga.contextid
+                                JOIN {grading_definitions} gd ON ga.id = gd.areaid
+                                JOIN {gradingform_guide_criteria} ggc ON (ggc.definitionid = gd.id)
+                                JOIN {grading_instances} gin ON gin.definitionid = gd.id
+                                JOIN {assign_grades} ag ON ag.id = gin.itemid
+                                JOIN {user} stu ON stu.id = ag.userid
+                                JOIN {user} rubm ON rubm.id = gin.raterid
+                                JOIN {gradingform_guide_fillings} ggf ON (ggf.instanceid = gin.id)
                                 AND (ggf.criterionid = ggc.id)
                                 WHERE cm.id = ? AND gin.status = 1
                                 ORDER BY lastname ASC, firstname ASC, userid ASC, ggc.sortorder ASC,
