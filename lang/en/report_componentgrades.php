@@ -43,4 +43,4 @@ $string['feedback'] = 'Feedback';
 $string['nogradesenteredrubric'] = "No grades have been entered into this assignment's rubric.";
 $string['nogradesenteredguide'] = "No grades have been entered into this assignment's marking guide.";
 $string['nobtecgrades'] = "No grades have been entered into this assignment's BTEC marking.";
-
+$string['privacy:metadata'] = 'The Export Component Grades plugin does not store any personal data.';
