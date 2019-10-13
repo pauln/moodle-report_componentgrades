@@ -44,3 +44,6 @@ $string['nogradesenteredrubric'] = "No grades have been entered into this assign
 $string['nogradesenteredguide'] = "No grades have been entered into this assignment's marking guide.";
 $string['nobtecgrades'] = "No grades have been entered into this assignment's BTEC marking.";
 $string['privacy:metadata'] = 'The Export Component Grades plugin does not store any personal data.';
+$string['showstudentid'] = 'Show student id';
+$string['showstudentid_text'] = 'Show student id in the report';
+

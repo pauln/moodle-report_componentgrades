@@ -72,7 +72,9 @@ function report_componentgrades_add_header(MoodleExcelWorkbook  $workbook, Moodl
     $sheet->write_string(5, 0, get_string('firstname', 'report_componentgrades'), $format2);
     $sheet->write_string(5, 1, get_string('lastname', 'report_componentgrades'), $format2);
     $sheet->write_string(5, 2, get_string('username', 'report_componentgrades'), $format2);
-    $sheet->write_string(5, 3, get_string('studentid', 'report_componentgrades'), $format2);
+    if (get_config('report_componentgrades', 'showstudentid')) {
+        $sheet->write_string(5, 3, get_string('studentid', 'report_componentgrades'), $format2);
+    }
     $sheet->set_column(0, 3, 10); // Set column widths to 10.
     /* TODO returning an arbitrary number needs fixing */
     return 4;
