@@ -51,8 +51,15 @@ function report_componentgrades_get_students($courseid) {
  * @param string $methodname
  * @return void
  */
-function report_componentgrades_add_header(MoodleExcelWorkbook  $workbook, MoodleExcelWorksheet  $sheet,
- $coursename, $modname, $method, $methodname) {
+function report_componentgrades_add_header(MoodleExcelWorkbook $workbook, MoodleExcelWorksheet $sheet,
+    $coursename, $modname, $method, $methodname) {
+    $cols['student'] = 0;
+    $cols['firstname'] = 0;
+    $cols['lastname'] = 1;
+    $cols['username'] = 2;
+    $cols['studentid'] = 3;
+    $cols['lastcol'] = 3;
+
     // Course, assignment, marking guide / rubric names.
     $format = $workbook->add_format(array('size' => 18, 'bold' => 1));
     $sheet->write_string(0, 0, $coursename, $format);
@@ -67,17 +74,23 @@ function report_componentgrades_add_header(MoodleExcelWorkbook  $workbook, Moodl
     // Column headers - two rows for grouping.
     $format = $workbook->add_format(array('size' => 12, 'bold' => 1));
     $format2 = $workbook->add_format(array('bold' => 1));
-    $sheet->write_string(4, 0, get_string('student', 'report_componentgrades'), $format);
-    $sheet->merge_cells(4, 0, 4, 3, $format);
-    $sheet->write_string(5, 0, get_string('firstname', 'report_componentgrades'), $format2);
-    $sheet->write_string(5, 1, get_string('lastname', 'report_componentgrades'), $format2);
-    $sheet->write_string(5, 2, get_string('username', 'report_componentgrades'), $format2);
+    $col = 0;
+    $row = 4;
+    $sheet->write_string($row, $cols['firstname'], get_string('student', 'report_componentgrades'), $format);
+    $sheet->merge_cells($row, $cols['student'], $row, $cols['lastname'], $format);
+    $row += 1;
+    $sheet->write_string($row, $cols['firstname'], get_string('firstname', 'report_componentgrades'), $format2);
+    $col += 1;
+    $sheet->write_string($row, $cols['lastname'], get_string('lastname', 'report_componentgrades'), $format2);
+    $col += 1;
+    $sheet->write_string($row, $cols['username'], get_string('username', 'report_componentgrades'), $format2);
     if (get_config('report_componentgrades', 'showstudentid')) {
-        $sheet->write_string(5, 3, get_string('studentid', 'report_componentgrades'), $format2);
-    }
-    $sheet->set_column(0, 3, 10); // Set column widths to 10.
+        $sheet->write_string($row, $cols['studentid'], get_string('studentid', 'report_componentgrades'), $format2);
+        $cols['lastcol'] = 4;
+      }
+    $sheet->set_column(0, $col, 10); // Set column widths to 10.
     /* TODO returning an arbitrary number needs fixing */
-    return 4;
+    return $cols['lastcol'];
 
 }
 /**
@@ -88,24 +101,26 @@ function report_componentgrades_add_header(MoodleExcelWorkbook  $workbook, Moodl
  * @param integer $pos
  * @return void
  */
-function report_componentgrades_finish_colheaders($workbook, $sheet, $pos) {
+function report_componentgrades_finish_colheaders($workbook, $sheet, $col) {
     // Grading info columns.
     $format = $workbook->add_format(array('size' => 12, 'bold' => 1));
     $format2 = $workbook->add_format(array('bold' => 1));
-    $sheet->write_string(4, $pos, get_string('gradinginfo', 'report_componentgrades'), $format);
-    $sheet->write_string(5, $pos, get_string('gradedby', 'report_componentgrades'), $format2);
-    $sheet->set_column($pos, $pos++, 10); // Set column width to 10.
-    $sheet->write_string(5, $pos, get_string('timegraded', 'report_componentgrades'), $format2);
-    $sheet->set_column($pos, $pos, 17.5); // Set column width to 17.5.
-    $sheet->merge_cells(4, $pos - 1, 4, $pos);
+    $col++;
+    $sheet->write_string(4, $col, get_string('gradinginfo', 'report_componentgrades'), $format);
+    $sheet->write_string(5, $col, get_string('gradedby', 'report_componentgrades'), $format2);
+    $col++;
+    $sheet->set_column($pos, $col, 10); // Set column width to 10.
+    $sheet->write_string(5, $col, get_string('timegraded', 'report_componentgrades'), $format2);
+    $sheet->set_column($col, $col, 17.5); // Set column width to 17.5.
+    $sheet->merge_cells(4, $col - 1, 4, $col);
 
     $sheet->set_row(4, 15, $format);
     $sheet->set_row(5, null, $format2);
 
-    // Merge header cells.
-    $sheet->merge_cells(0, 0, 0, $pos);
-    $sheet->merge_cells(1, 0, 1, $pos);
-    $sheet->merge_cells(2, 0, 2, $pos);
+    //  Merge header cells.
+     $sheet->merge_cells(0, 0, 0, $col);
+     $sheet->merge_cells(1, 0, 1, $col);
+     $sheet->merge_cells(2, 0, 2, $col);
 }
 /**
  * Get data for each student
@@ -145,7 +160,10 @@ function report_componentgrades_add_data(MoodleExcelWorksheet $sheet, array $stu
         $sheet->write_string($row, $col++, $student->firstname);
         $sheet->write_string($row, $col++, $student->lastname);
         $sheet->write_string($row, $col++, $student->student);
-        $sheet->write_string($row, $col++, $student->idnumber);
+        if (get_config('report_componentgrades', 'showstudentid')) {
+            $sheet->write_string($row, $col++, $student->idnumber);
+           // $sheet->set_column($row,$col, 300);//set width
+        }
 
         foreach ($student->data as $line) {
             if (is_numeric($line->score)) {
@@ -158,8 +176,8 @@ function report_componentgrades_add_data(MoodleExcelWorksheet $sheet, array $stu
                 // Only rubrics have a "definition".
                 $sheet->write_string($row, $col++, $line->definition);
             }
-            $sheet->write_string($row, $col++, $line->remark);
-            if ($col === $gradinginfopos) {
+            $sheet->write_string($row, $col, $line->remark);
+           // if ($col >= $gradinginfopos) {
                 if ($method == 'btec') {
                     /* Add the overall assignment grade converted to R,P,M,D
                      * and the feedback given for the overal assignment
@@ -174,7 +192,7 @@ function report_componentgrades_add_data(MoodleExcelWorksheet $sheet, array $stu
                 $sheet->write_string($row, $col++, $line->grader);
                 $sheet->set_column($col, $col, 35);
                 $sheet->write_string($row, $col, userdate($line->modified));
-            }
+           // }
         }
     }
 }

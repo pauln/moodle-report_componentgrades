@@ -22,12 +22,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require('../../config.php');
-require_once($CFG->dirroot.'/lib/excellib.class.php');
-require_once($CFG->dirroot.'/report/componentgrades/locallib.php');
+require '../../config.php';
+require_once $CFG->dirroot . '/lib/excellib.class.php';
+require_once $CFG->dirroot . '/report/componentgrades/locallib.php';
 
-$id          = required_param('id', PARAM_INT);// Course ID.
-$modid       = required_param('modid', PARAM_INT);// CM ID.
+$id = required_param('id', PARAM_INT); // Course ID.
+$modid = required_param('modid', PARAM_INT); // CM ID.
 
 $params['id'] = $id;
 $params['modid'] = $id;
@@ -46,8 +46,8 @@ require_capability('mod/assign:grade', $modcontext);
 $event = \report_componentgrades\event\report_viewed::create(array(
     'context' => $modcontext,
     'other' => array(
-        'gradingmethod' => 'rubric'
-    )
+        'gradingmethod' => 'rubric',
+    ),
 ));
 $event->add_record_snapshot('course_modules', $cm);
 $event->trigger();
@@ -80,7 +80,7 @@ $students = report_componentgrades_get_students($course->id);
 
 $first = reset($data);
 if ($first === false) {
-    $url = $CFG->wwwroot.'/mod/assign/view.php?id='.$cm->id;
+    $url = $CFG->wwwroot . '/mod/assign/view.php?id=' . $cm->id;
     $message = get_string('nogradesenteredrubric', 'report_componentgrades');
     redirect($url, $message, 5);
     exit;
@@ -90,29 +90,44 @@ $workbook = new MoodleExcelWorkbook("-");
 $workbook->send($filename);
 $sheet = $workbook->add_worksheet($cm->name);
 
-report_componentgrades_add_header($workbook, $sheet, $course->fullname, $cm->name, 'rubric', $first->rubric);
+$firstcol = report_componentgrades_add_header($workbook, $sheet, $course->fullname, $cm->name, 'rubric', $first->rubric);
 
-$pos = 4;
-$format = $workbook->add_format(array('size' => 12, 'bold' => 1));
-$format2 = $workbook->add_format(array('bold' => 1));
+$format = $workbook->add_format(['size' => 12, 'bold' => 1]);
+$format2 = $workbook->add_format(['bold' => 1]);
+
+$cols['description'] =$firstcol;
+
+$cols['score'] = $firstcol;
+$cols['definition'] = $firstcol + 1;
+$cols['feedback'] = $firstcol + 2;
+
+$colcount = count($cols) -1;
+
+$count = 0;
+// Set up the grading column headings
 foreach ($data as $line) {
     if ($line->userid !== $first->userid) {
         break;
     }
-    $sheet->write_string(4, $pos, $line->description, $format);
-    $sheet->merge_cells(4, $pos, 4, $pos + 2, $format);
-    $sheet->write_string(5, $pos, get_string('score', 'report_componentgrades'), $format2);
-    $sheet->set_column($pos, $pos++, 6); // Set column width to 6.
-    $sheet->write_string(5, $pos++, get_string('definition', 'report_componentgrades'), $format2);
-    $sheet->write_string(5, $pos, get_string('feedback', 'report_componentgrades'), $format2);
-    $sheet->set_column($pos - 1, $pos++, 10); // Set column widths to 10.
+    $sheet->write_string(4, $cols['description'] + $count, $line->description, $format);
+   // $sheet->merge_cells(4, ($colcount + $count), 4, ($colcount + $count) + 2, $format);
+    $sheet->write_string(5, $cols['score'] + $count, get_string('score', 'report_componentgrades'), $format2);
+    $sheet->set_column($cols['score'] + $count, $cols['score'] + $count, 6); // Set column width to 6.
+
+    $sheet->write_string(5, $cols['definition'] + $count, get_string('definition', 'report_componentgrades'), $format2);
+    $sheet->set_column($cols['definition'] + $count, $cols['definition'] + $count, 12);
+
+    $sheet->write_string(5, $cols['feedback'] + $count, get_string('feedback', 'report_componentgrades'), $format2);
+    $sheet->set_column($cols['feedback'] + $count, $cols['feedback'] + $count, 30);
+    $count += $colcount;
+
 }
 
-$gradinginfopos = $pos;
-report_componentgrades_finish_colheaders($workbook, $sheet, $pos);
+$infocol = ($count + $colcount);
+report_componentgrades_finish_colheaders($workbook, $sheet, $infocol);
 
 $students = report_componentgrades_process_data($students, $data);
-report_componentgrades_add_data($sheet, $students, $gradinginfopos, 'rubric');
+report_componentgrades_add_data($sheet, $students, $infocol, 'rubric');
 
 $workbook->close();
 
