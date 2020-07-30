@@ -97,6 +97,10 @@ function report_componentgrades_finish_colheaders($workbook, $sheet, $pos) {
     $sheet->set_column($pos, $pos++, 10); // Set column width to 10.
     $sheet->write_string(5, $pos, get_string('timegraded', 'report_componentgrades'), $format2);
     $sheet->set_column($pos, $pos, 17.5); // Set column width to 17.5.
+    $sheet->write_string(5, $pos, get_string('grade', 'report_componentgrades'), $format2);
+    $sheet->set_column($pos, $pos++, 10); // Set column width to 10
+    $sheet->write_string(5, $pos, get_string('feedback', 'report_componentgrades'), $format2);
+    $sheet->set_column($pos, $pos++, 17.5); // Set column width to 17.5
     $sheet->merge_cells(4, $pos - 1, 4, $pos);
 
     $sheet->set_row(4, 15, $format);
@@ -174,6 +178,10 @@ function report_componentgrades_add_data(MoodleExcelWorksheet $sheet, array $stu
                 $sheet->write_string($row, $col++, $line->grader);
                 $sheet->set_column($col, $col, 35);
                 $sheet->write_string($row, $col, userdate($line->modified));
+                $sheet->set_column($col, $col, 13);
+                $sheet->write_string($row, $col++, $line->grade);
+                $sheet->set_column($col, $col, 14);
+                $sheet->write_string($row, $col++, strip_tags($line->feedback));
             }
         }
     }
