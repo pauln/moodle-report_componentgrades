@@ -43,6 +43,8 @@ $cm = $modinfo->get_cm($modid);
 $modcontext = context_module::instance($cm->id);
 require_capability('mod/assign:grade', $modcontext);
 
+$showgroups = !empty($course->groupmode) && get_config('report_componentgrades', 'showgroups');
+
 // Trigger event for logging.
 $event = \report_componentgrades\event\report_viewed::create(array(
     'context' => $modcontext,
@@ -90,7 +92,7 @@ $workbook = new MoodleExcelWorkbook("-");
 $workbook->send($filename);
 $sheet = $workbook->add_worksheet($cm->name);
 
-$pos = report_componentgrades_add_header($workbook, $sheet, $course->fullname, $cm->name, 'rubric', $first->rubric);
+$pos = report_componentgrades_add_header($workbook, $sheet, $course->fullname, $cm->name, 'rubric', $first->rubric, $showgroups);
 
 $format = $workbook->add_format(array('size' => 12, 'bold' => 1));
 $format2 = $workbook->add_format(array('bold' => 1));
@@ -111,7 +113,12 @@ $gradinginfopos = $pos;
 report_componentgrades_finish_colheaders($workbook, $sheet, $pos);
 
 $students = report_componentgrades_process_data($students, $data);
-$row = report_componentgrades_add_data($sheet, $students, $gradinginfopos, 'rubric');
+
+$groups = array();
+if ($showgroups) {
+    $groups = report_componentgrades_get_user_groups($course->id);
+}
+$row = report_componentgrades_add_data($sheet, $students, $gradinginfopos, 'rubric', $groups);
 
 $sheet->write_formula(($row + 1), 3, '=SUM(D7:D8)');
 

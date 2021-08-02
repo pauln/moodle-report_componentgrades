@@ -29,4 +29,11 @@ if ($ADMIN->fulltree) {
         get_string('showstudentid_text', 'report_componentgrades'),
         0
     ));
+
+    $settings->add(new admin_setting_configcheckbox(
+        'report_componentgrades/showgroups',
+        get_string('showgroups', 'report_componentgrades'),
+        get_string('showgroups_desc', 'report_componentgrades'),
+        1
+    ));
 }
