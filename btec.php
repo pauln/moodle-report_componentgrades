@@ -71,9 +71,9 @@ $data = $DB->get_records_sql("SELECT gbf.id AS ggfid, crs.shortname AS course, a
                                 JOIN {user} stu ON stu.id = ag.userid
                                 JOIN {user} marker ON marker.id = gin.raterid
                                 JOIN {gradingform_btec_fillings} gbf ON (gbf.instanceid = gin.id)
-                                AND (gbf.criterionid = gbc.id)
-                                WHERE cm.id = ? AND gin.status = 1
-                                ORDER BY lastname ASC, firstname ASC, userid ASC, gbc.sortorder ASC,
+                                 AND (gbf.criterionid = gbc.id)
+                               WHERE cm.id = ? AND gin.status = 1
+                            ORDER BY lastname ASC, firstname ASC, userid ASC, gbc.sortorder ASC,
                                 gbc.shortname ASC", array($cm->id));
 
 foreach ($data as $d) {
@@ -85,7 +85,7 @@ foreach ($data as $d) {
     }
 }
 
-$students = report_componentgrades_get_students($course->id);
+$students = report_componentgrades_get_students($modcontext, $cm);
 
 $first = reset($data);
 if ($first === false) {
@@ -121,6 +121,9 @@ $sheet->write_string(5, $pos, 'Comment', $format2);
 $sheet->set_column($pos, $pos, 12);
 $pos++;
 report_componentgrades_finish_colheaders($workbook, $sheet, $pos);
+foreach ($data as $item) {
+    $item->commenttext = strip_tags($item->commenttext);
+}
 $students = report_componentgrades_process_data($students, $data);
 report_componentgrades_add_data($sheet, $students, $gradinginfopos, 'btec');
 

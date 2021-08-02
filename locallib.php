@@ -23,21 +23,36 @@
  */
 
 defined('MOODLE_INTERNAL') || die;
+define("TITLESROW", 4);
+define("HEADINGSROW", 5);
+
+require_once($CFG->dirroot.'/mod/assign/locallib.php');
+
 /**
- * Get all students given a course id
- *
- * @param integer $courseid
- * @return void
+ * Get all students given the course/module details
+ * @param \context_module $modcontext
+ * @param \stdClass $cm
+ * @return array
  */
-function report_componentgrades_get_students($courseid) {
+function report_componentgrades_get_students($modcontext, $cm) :array {
     global $DB;
-    return $DB->get_records_sql('SELECT stu.id AS userid, stu.idnumber AS idnumber,
+    $assign = new assign($modcontext, $cm, $cm->course);
+    $result = $DB->get_records_sql('SELECT stu.id AS userid, stu.idnumber AS idnumber,
         stu.firstname, stu.lastname, stu.username AS student
         FROM {user} stu
         JOIN {user_enrolments} ue ON ue.userid = stu.id
         JOIN {enrol} enr ON ue.enrolid = enr.id
-        WHERE enr.courseid = ?
-        ORDER BY lastname ASC, firstname ASC, userid ASC', array($courseid));
+       WHERE enr.courseid = ?
+    ORDER BY lastname ASC, firstname ASC, userid ASC', [$cm->course]);
+    if ($assign->is_blind_marking()) {
+        foreach ($result as &$r) {
+            $r->firstname = '';
+            $r->lastname = '';
+            $r->student = get_string('participant', 'assign') .
+             ' ' . \assign::get_uniqueid_for_user_static($cm->instance, $r->userid);
+        }
+    }
+    return $result;
 }
 /**
  * Add header text to report, name of course etc
@@ -51,8 +66,8 @@ function report_componentgrades_get_students($courseid) {
  * @param string $methodname
  * @return void
  */
-function report_componentgrades_add_header(MoodleExcelWorkbook  $workbook, MoodleExcelWorksheet  $sheet,
- $coursename, $modname, $method, $methodname) {
+function report_componentgrades_add_header(MoodleExcelWorkbook $workbook, MoodleExcelWorksheet $sheet,
+    $coursename, $modname, $method, $methodname) {
     // Course, assignment, marking guide / rubric names.
     $format = $workbook->add_format(array('size' => 18, 'bold' => 1));
     $sheet->write_string(0, 0, $coursename, $format);
@@ -60,24 +75,37 @@ function report_componentgrades_add_header(MoodleExcelWorkbook  $workbook, Moodl
     $format = $workbook->add_format(array('size' => 16, 'bold' => 1));
     $sheet->write_string(1, 0, $modname, $format);
     $sheet->set_row(1, 21, $format);
-    $methodname = ($method == 'rubric' ? 'Rubric: ' : 'Marking guide: ') . $methodname;
+    switch($method) {
+        case 'rubric':
+              $methodname = get_string('rubric', 'gradingform_rubric').' '.$methodname;
+              break;
+        case 'markingguide':
+              $methodname = get_string('guide', 'gradingform_guide').' '.$methodname;
+              break;
+        case 'btec':
+              $methodname = get_string('rubric', 'gradingform_rubric').' '.$methodname;
+              break;
+    }
+
     $sheet->write_string(2, 0, $methodname, $format);
     $sheet->set_row(2, 21, $format);
 
     // Column headers - two rows for grouping.
     $format = $workbook->add_format(array('size' => 12, 'bold' => 1));
     $format2 = $workbook->add_format(array('bold' => 1));
-    $sheet->write_string(4, 0, get_string('student', 'report_componentgrades'), $format);
-    $sheet->merge_cells(4, 0, 4, 3, $format);
-    $sheet->write_string(5, 0, get_string('firstname', 'report_componentgrades'), $format2);
-    $sheet->write_string(5, 1, get_string('lastname', 'report_componentgrades'), $format2);
-    $sheet->write_string(5, 2, get_string('username', 'report_componentgrades'), $format2);
+    $sheet->write_string(TITLESROW, 0, get_string('student', 'report_componentgrades'), $format);
+    $sheet->merge_cells(TITLESROW, 0, TITLESROW, 2, $format);
+    $col = 0;
+    $sheet->write_string(HEADINGSROW, $col++, get_string('firstname', 'report_componentgrades'), $format2);
+    $sheet->write_string(HEADINGSROW, $col++, get_string('lastname', 'report_componentgrades'), $format2);
+    $sheet->write_string(HEADINGSROW, $col++, get_string('username', 'report_componentgrades'), $format2);
     if (get_config('report_componentgrades', 'showstudentid')) {
-        $sheet->write_string(5, 3, get_string('studentid', 'report_componentgrades'), $format2);
+        $sheet->write_string(HEADINGSROW, $col, get_string('studentid', 'report_componentgrades'), $format2);
+        $col++;
     }
-    $sheet->set_column(0, 3, 10); // Set column widths to 10.
+    $sheet->set_column(0, $col, 10); // Set column widths to 10.
     /* TODO returning an arbitrary number needs fixing */
-    return 4;
+    return $col;
 
 }
 /**
@@ -93,14 +121,14 @@ function report_componentgrades_finish_colheaders($workbook, $sheet, $pos) {
     $format = $workbook->add_format(array('size' => 12, 'bold' => 1));
     $format2 = $workbook->add_format(array('bold' => 1));
     $sheet->write_string(4, $pos, get_string('gradinginfo', 'report_componentgrades'), $format);
-    $sheet->write_string(5, $pos, get_string('gradedby', 'report_componentgrades'), $format2);
+    $sheet->write_string(HEADINGSROW, $pos, get_string('gradedby', 'report_componentgrades'), $format2);
     $sheet->set_column($pos, $pos++, 10); // Set column width to 10.
-    $sheet->write_string(5, $pos, get_string('timegraded', 'report_componentgrades'), $format2);
+    $sheet->write_string(HEADINGSROW, $pos, get_string('timegraded', 'report_componentgrades'), $format2);
     $sheet->set_column($pos, $pos, 17.5); // Set column width to 17.5.
     $sheet->merge_cells(4, $pos - 1, 4, $pos);
 
     $sheet->set_row(4, 15, $format);
-    $sheet->set_row(5, null, $format2);
+    $sheet->set_row(HEADINGSROW, null, $format2);
 
     // Merge header cells.
     $sheet->merge_cells(0, 0, 0, $pos);
@@ -112,9 +140,9 @@ function report_componentgrades_finish_colheaders($workbook, $sheet, $pos) {
  *
  * @param array $students
  * @param array $data array of objects
- * @return void
+ * @return array
  */
-function report_componentgrades_process_data(array $students, array $data) {
+function report_componentgrades_process_data(array $students, array $data)  {
     foreach ($students as $student) {
         $student->data = array();
         foreach ($data as $key => $line) {
@@ -137,7 +165,6 @@ function report_componentgrades_process_data(array $students, array $data) {
  */
 function report_componentgrades_add_data(MoodleExcelWorksheet $sheet, array $students, $gradinginfopos, $method) {
     // Actual data.
-    $lastuser = 0;
     $row = 5;
     foreach ($students as $student) {
         $col = 0;
@@ -145,7 +172,9 @@ function report_componentgrades_add_data(MoodleExcelWorksheet $sheet, array $stu
         $sheet->write_string($row, $col++, $student->firstname);
         $sheet->write_string($row, $col++, $student->lastname);
         $sheet->write_string($row, $col++, $student->student);
-        $sheet->write_string($row, $col++, $student->idnumber);
+        if (get_config('report_componentgrades', 'showstudentid')) {
+             $sheet->write_string($row, $col++, $student->idnumber);
+        }
 
         foreach ($student->data as $line) {
             if (is_numeric($line->score)) {
@@ -177,4 +206,5 @@ function report_componentgrades_add_data(MoodleExcelWorksheet $sheet, array $stu
             }
         }
     }
+    return $row;
 }
