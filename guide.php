@@ -75,7 +75,7 @@ $data = $DB->get_records_sql("SELECT    ggf.id AS ggfid, crs.shortname AS course
                                 ORDER BY lastname ASC, firstname ASC, userid ASC, ggc.sortorder ASC,
                                 ggc.shortname ASC", array($cm->id));
 
-$students = report_componentgrades_get_students($course->id);
+$students = report_componentgrades_get_students($modcontext, $cm);
 
 $first = reset($data);
 if ($first === false) {
@@ -89,17 +89,16 @@ $workbook = new MoodleExcelWorkbook("-");
 $workbook->send($filename);
 $sheet = $workbook->add_worksheet($cm->name);
 
-report_componentgrades_add_header($workbook, $sheet, $course->fullname, $cm->name, 'guide', $first->guide);
+$pos = report_componentgrades_add_header($workbook, $sheet, $course->fullname, $cm->name, 'guide', $first->guide);
 
-$pos = 4;
 $format = $workbook->add_format(array('size' => 12, 'bold' => 1));
 $format2 = $workbook->add_format(array('bold' => 1));
 foreach ($data as $line) {
     if ($line->userid !== $first->userid) {
         break;
     }
-    $sheet->write_string(4, $pos, $line->shortname, $format);
-    $sheet->merge_cells(4, $pos, 4, $pos + 1, $format);
+    $sheet->write_string(TITLESROW, $pos, $line->shortname, $format);
+    $sheet->merge_cells(TITLESROW, $pos, 4, $pos + 1, $format);
     $sheet->write_string(5, $pos, get_string('score', 'report_componentgrades'), $format2);
     $sheet->set_column($pos, $pos++, 6); // Set column width to 6.
     $sheet->write_string(5, $pos, get_string('feedback', 'report_componentgrades'), $format2);

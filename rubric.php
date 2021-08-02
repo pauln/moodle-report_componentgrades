@@ -39,6 +39,7 @@ require_login($course);
 
 $modinfo = get_fast_modinfo($course->id);
 $cm = $modinfo->get_cm($modid);
+
 $modcontext = context_module::instance($cm->id);
 require_capability('mod/assign:grade', $modcontext);
 
@@ -71,12 +72,11 @@ $data = $DB->get_records_sql("SELECT    grf.id AS grfid, crs.shortname AS course
                                 JOIN {user} stu ON stu.id = ag.userid
                                 JOIN {user} rubm ON rubm.id = gin.raterid
                                 JOIN {gradingform_rubric_fillings} grf ON (grf.instanceid = gin.id)
-                                AND (grf.criterionid = grc.id) AND (grf.levelid = grl.id)
-                                WHERE cm.id = ? AND gin.status = 1
-                                ORDER BY lastname ASC, firstname ASC, userid ASC, grc.sortorder ASC,
+                                 AND (grf.criterionid = grc.id) AND (grf.levelid = grl.id)
+                               WHERE cm.id = ? AND gin.status = 1
+                            ORDER BY lastname ASC, firstname ASC, userid ASC, grc.sortorder ASC,
                                 grc.description ASC", array($cm->id));
-
-$students = report_componentgrades_get_students($course->id);
+$students = report_componentgrades_get_students($modcontext, $cm);
 
 $first = reset($data);
 if ($first === false) {
@@ -90,21 +90,20 @@ $workbook = new MoodleExcelWorkbook("-");
 $workbook->send($filename);
 $sheet = $workbook->add_worksheet($cm->name);
 
-report_componentgrades_add_header($workbook, $sheet, $course->fullname, $cm->name, 'rubric', $first->rubric);
+$pos = report_componentgrades_add_header($workbook, $sheet, $course->fullname, $cm->name, 'rubric', $first->rubric);
 
-$pos = 4;
 $format = $workbook->add_format(array('size' => 12, 'bold' => 1));
 $format2 = $workbook->add_format(array('bold' => 1));
 foreach ($data as $line) {
     if ($line->userid !== $first->userid) {
         break;
     }
-    $sheet->write_string(4, $pos, $line->description, $format);
-    $sheet->merge_cells(4, $pos, 4, $pos + 2, $format);
-    $sheet->write_string(5, $pos, get_string('score', 'report_componentgrades'), $format2);
+    $sheet->write_string(TITLESROW, $pos, $line->description, $format);
+    $sheet->merge_cells(TITLESROW, $pos, TITLESROW, $pos + 2, $format);
+    $sheet->write_string(HEADINGSROW, $pos, get_string('score', 'report_componentgrades'), $format2);
     $sheet->set_column($pos, $pos++, 6); // Set column width to 6.
-    $sheet->write_string(5, $pos++, get_string('definition', 'report_componentgrades'), $format2);
-    $sheet->write_string(5, $pos, get_string('feedback', 'report_componentgrades'), $format2);
+    $sheet->write_string(HEADINGSROW, $pos++, get_string('definition', 'report_componentgrades'), $format2);
+    $sheet->write_string(HEADINGSROW, $pos, get_string('feedback', 'report_componentgrades'), $format2);
     $sheet->set_column($pos - 1, $pos++, 10); // Set column widths to 10.
 }
 
@@ -112,8 +111,11 @@ $gradinginfopos = $pos;
 report_componentgrades_finish_colheaders($workbook, $sheet, $pos);
 
 $students = report_componentgrades_process_data($students, $data);
-report_componentgrades_add_data($sheet, $students, $gradinginfopos, 'rubric');
+$row = report_componentgrades_add_data($sheet, $students, $gradinginfopos, 'rubric');
+
+$sheet->write_formula(($row + 1), 3, '=SUM(D7:D8)');
 
 $workbook->close();
+
 
 exit;

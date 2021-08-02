@@ -29,10 +29,10 @@ defined('MOODLE_INTERNAL') || die();
  * Class for tests related to componentgrades report events.
  *
  * @package    report_componentgrades
- * @copyright  2018 Marcus Green <rajesh@moodle.com>
+ * @copyright  2018 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later.
  */
-class report_componentgrades_events_testcase extends advanced_testcase {
+class report_componentgrades_events_testcase extends \advanced_testcase {
 
     /**
      * Setup testcase.
@@ -53,7 +53,7 @@ class report_componentgrades_events_testcase extends advanced_testcase {
         $course = $this->getDataGenerator()->create_course();
         $assign = $this->getDataGenerator()->create_module('assign', array('course' => $course->id));
 
-        $modcontext = context_module::instance($assign->cmid);
+        $modcontext = \context_module::instance($assign->cmid);
         $event = \report_componentgrades\event\report_viewed::create(array(
                     'context' => $modcontext,
                     'other' => array(

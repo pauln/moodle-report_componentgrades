@@ -20,14 +20,14 @@
  * This File contains information about the current version of report/componentgrades
  *
  * @package    report_componentgrades
- * @copyright  2014 Paul Nicholls
+ * @copyright  2021 Paul Nicholls/Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die;
 
-$plugin->version   = 2019091300;    // The current plugin version (Date: YYYYMMDDXX)
+$plugin->version   = 2021071700;  // The current plugin version (Date: YYYYMMDDXX).
 $plugin->requires  = 2015051109;  // Moodle 2.9.9.
-$plugin->release   = '1.2';
+$plugin->release   = '1.3';
 $plugin->maturity  = MATURITY_STABLE;
 $plugin->component = 'report_componentgrades';  // Full name of the plugin (used for diagnostics).
