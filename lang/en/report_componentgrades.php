@@ -24,12 +24,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['pluginname'] = 'Export Component Grades';
-$string['rubricgrades'] = 'Export Rubric Grades';
-$string['guidegrades'] = 'Export Marking Guide Grades';
-$string['btecgrades'] = 'Export BTEC Grades';
-$string['eventreportviewed'] = 'Component Grades exported';
-$string['gradinginfo'] = 'Grading Info';
+$string['pluginname'] = 'Export component grades';
+$string['rubricgrades'] = 'Export rubric grades';
+$string['guidegrades'] = 'Export marking guide grades';
+$string['btecgrades'] = 'Export BTEC grades';
+$string['eventreportviewed'] = 'Component grades exported';
+$string['gradinginfo'] = 'Grading info';
 $string['gradedby'] = 'Graded by';
 $string['student'] = 'Student';
 $string['timegraded'] = 'Time graded';
@@ -43,7 +43,7 @@ $string['feedback'] = 'Feedback';
 $string['nogradesenteredrubric'] = "No grades have been entered into this assignment's rubric.";
 $string['nogradesenteredguide'] = "No grades have been entered into this assignment's marking guide.";
 $string['nobtecgrades'] = "No grades have been entered into this assignment's BTEC marking.";
-$string['privacy:metadata'] = 'The Export Component Grades plugin does not store any personal data.';
+$string['privacy:metadata'] = 'The export component grades plugin does not store any personal data.';
 $string['showstudentid'] = 'Show student id';
 $string['showstudentid_text'] = 'Show student id in the report';
 
