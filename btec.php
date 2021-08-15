@@ -41,6 +41,8 @@ $cm = $modinfo->get_cm($modid);
 $modcontext = context_module::instance($cm->id);
 require_capability('mod/assign:grade', $modcontext);
 
+$showgroups = !empty($course->groupmode) && get_config('report_componentgrades', 'showgroups');
+
 // Trigger event for logging.
 $event = \report_componentgrades\event\report_viewed::create(array(
             'context' => $modcontext,
@@ -98,7 +100,7 @@ $workbook = new MoodleExcelWorkbook("-");
 $workbook->send($filename);
 $sheet = $workbook->add_worksheet($cm->name);
 
-$pos = report_componentgrades_add_header($workbook, $sheet, $course->fullname, $cm->name, 'btec', $first->btec);
+$pos = report_componentgrades_add_header($workbook, $sheet, $course->fullname, $cm->name, 'btec', $first->btec, $showgroups);
 $format = $workbook->add_format(array('size' => 12, 'bold' => 1));
 $format2 = $workbook->add_format(array('bold' => 1));
 foreach ($data as $line) {
@@ -125,7 +127,12 @@ foreach ($data as $item) {
     $item->commenttext = strip_tags($item->commenttext);
 }
 $students = report_componentgrades_process_data($students, $data);
-report_componentgrades_add_data($sheet, $students, $gradinginfopos, 'btec');
+
+$groups = array();
+if ($showgroups) {
+    $groups = report_componentgrades_get_user_groups($course->id);
+}
+report_componentgrades_add_data($sheet, $students, $gradinginfopos, 'btec', $groups);
 
 $workbook->close();
 

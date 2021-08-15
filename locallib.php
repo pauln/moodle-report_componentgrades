@@ -64,10 +64,12 @@ function report_componentgrades_get_students($modcontext, $cm) :array {
  * @param string $modname
  * @param string $method
  * @param string $methodname
- * @return void
+ * @param boolean $showgroups - groups being shown.
+ * @return int
  */
 function report_componentgrades_add_header(MoodleExcelWorkbook $workbook, MoodleExcelWorksheet $sheet,
-    $coursename, $modname, $method, $methodname) {
+    $coursename, $modname, $method, $methodname, $showgroups = false) {
+
     // Course, assignment, marking guide / rubric names.
     $format = $workbook->add_format(array('size' => 18, 'bold' => 1));
     $sheet->write_string(0, 0, $coursename, $format);
@@ -103,10 +105,12 @@ function report_componentgrades_add_header(MoodleExcelWorkbook $workbook, Moodle
         $sheet->write_string(HEADINGSROW, $col, get_string('studentid', 'report_componentgrades'), $format2);
         $col++;
     }
+    if ($showgroups) {
+        $sheet->write_string(HEADINGSROW, $col++, get_string('groups'), $format2);
+    }
     $sheet->set_column(0, $col, 10); // Set column widths to 10.
-    /* TODO returning an arbitrary number needs fixing */
-    return $col;
 
+    return $col;
 }
 /**
  * Column headers after data, e.g. who graded it and when
@@ -161,9 +165,10 @@ function report_componentgrades_process_data(array $students, array $data)  {
  * @param array $students
  * @param integer $gradinginfopos
  * @param string $method
+ * @param array $groups - user group information (optional).
  * @return void
  */
-function report_componentgrades_add_data(MoodleExcelWorksheet $sheet, array $students, $gradinginfopos, $method) {
+function report_componentgrades_add_data(MoodleExcelWorksheet $sheet, array $students, $gradinginfopos, $method, $groups = null) {
     // Actual data.
     $row = 5;
     foreach ($students as $student) {
@@ -174,6 +179,13 @@ function report_componentgrades_add_data(MoodleExcelWorksheet $sheet, array $stu
         $sheet->write_string($row, $col++, $student->student);
         if (get_config('report_componentgrades', 'showstudentid')) {
              $sheet->write_string($row, $col++, $student->idnumber);
+        }
+        if (!is_null($groups)) {
+            if (isset($groups[$student->userid])) {
+                $sheet->write_string($row, $col++, implode(', ', $groups[$student->userid]));
+            } else {
+                $sheet->write_string($row, $col++, 'empty');
+            }
         }
 
         foreach ($student->data as $line) {
@@ -207,4 +219,29 @@ function report_componentgrades_add_data(MoodleExcelWorksheet $sheet, array $stu
         }
     }
     return $row;
+}
+
+/**
+ * Get object with list of groups each user is in.
+ *
+ * @param int $courseid
+ */
+function report_componentgrades_get_user_groups($courseid) {
+    global $DB;
+
+    $sql = "SELECT g.id, g.name, gm.userid
+              FROM {groups} g
+              JOIN {groups_members} gm ON gm.groupid = g.id
+             WHERE g.courseid = ?
+          ORDER BY gm.userid";
+
+    $rs = $DB->get_recordset_sql($sql, [$courseid]);
+    foreach ($rs as $row) {
+        if (!isset($groupsbyuser[$row->userid])) {
+            $groupsbyuser[$row->userid] = [];
+        }
+        $groupsbyuser[$row->userid][] = $row->name;
+    }
+    $rs->close();
+    return $groupsbyuser;
 }
