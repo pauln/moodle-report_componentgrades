@@ -120,8 +120,6 @@ if ($showgroups) {
 }
 $row = report_componentgrades_add_data($sheet, $students, $gradinginfopos, 'rubric', $groups);
 
-$sheet->write_formula(($row + 1), 3, '=SUM(D7:D8)');
-
 $workbook->close();
 
 
