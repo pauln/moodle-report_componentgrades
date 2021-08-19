@@ -10,3 +10,5 @@ https://moodle.org/plugins/report_componentgrades
 Or using git from the command line go to moodle\report then
 
 git clone https://github.com/marcusgreen/moodle-report_componentgrades componentgrades
+
+User documentation https://docs.moodle.org/311/en/report/componentgrades
