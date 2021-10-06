@@ -58,9 +58,10 @@ $event->trigger();
 $filename = $course->shortname . ' - ' . $cm->name . '.xls';
 
 $data = $DB->get_records_sql("SELECT    grf.id AS grfid, crs.shortname AS course, asg.name AS assignment, gd.name AS rubric,
-                                        grc.description, grl.definition, grl.score, grf.remark, grf.criterionid,
+                                        grc.description, grl.definition, grl.score, cms.max AS maxscore, grf.remark, grf.criterionid,
                                         rubm.username AS grader, stu.id AS userid, stu.idnumber AS idnumber, stu.firstname,
-                                        stu.lastname, stu.username AS student, gin.timemodified AS modified
+                                        stu.lastname, stu.username AS student, gin.timemodified AS modified, ag.grade AS grade, asg.grade AS maxgrade,
+                                        afc.commenttext AS feedback
                                 FROM {course} crs
                                 JOIN {course_modules} cm ON crs.id = cm.course
                                 JOIN {assign} asg ON asg.id = cm.instance
@@ -71,9 +72,11 @@ $data = $DB->get_records_sql("SELECT    grf.id AS grfid, crs.shortname AS course
                                 JOIN {gradingform_rubric_levels} grl ON (grl.criterionid = grc.id)
                                 JOIN {grading_instances} gin ON gin.definitionid = gd.id
                                 JOIN {assign_grades} ag ON ag.id = gin.itemid
+                                JOIN {assignfeedback_comments} afc ON ag.id = afc.grade
                                 JOIN {user} stu ON stu.id = ag.userid
                                 JOIN {user} rubm ON rubm.id = gin.raterid
                                 JOIN {gradingform_rubric_fillings} grf ON (grf.instanceid = gin.id)
+                                JOIN (SELECT max(score), criterionid FROM mdl_gradingform_rubric_levels Group by criterionid) cms ON cms.criterionid = grc.id
                                  AND (grf.criterionid = grc.id) AND (grf.levelid = grl.id)
                                WHERE cm.id = ? AND gin.status = 1
                             ORDER BY lastname ASC, firstname ASC, userid ASC, grc.sortorder ASC,
@@ -101,8 +104,10 @@ foreach ($data as $line) {
         break;
     }
     $sheet->write_string(TITLESROW, $pos, $line->description, $format);
-    $sheet->merge_cells(TITLESROW, $pos, TITLESROW, $pos + 2, $format);
+    $sheet->merge_cells(TITLESROW, $pos, TITLESROW, $pos + 3, $format);
     $sheet->write_string(HEADINGSROW, $pos, get_string('score', 'report_componentgrades'), $format2);
+    $sheet->set_column($pos, $pos++, 6); // Set column width to 6.
+    $sheet->write_string(HEADINGSROW, $pos, get_string('outof', 'report_componentgrades'), $format2);
     $sheet->set_column($pos, $pos++, 6); // Set column width to 6.
     $sheet->write_string(HEADINGSROW, $pos++, get_string('definition', 'report_componentgrades'), $format2);
     $sheet->write_string(HEADINGSROW, $pos, get_string('feedback', 'report_componentgrades'), $format2);

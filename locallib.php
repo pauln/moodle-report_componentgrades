@@ -130,7 +130,13 @@ function report_componentgrades_finish_colheaders($workbook, $sheet, $pos) {
     $sheet->write_string(HEADINGSROW, $pos, get_string('gradedby', 'report_componentgrades'), $format2);
     $sheet->set_column($pos, $pos++, 10); // Set column width to 10.
     $sheet->write_string(HEADINGSROW, $pos, get_string('timegraded', 'report_componentgrades'), $format2);
-    $sheet->set_column($pos, $pos, 17.5); // Set column width to 17.5.
+    $sheet->set_column($pos, $pos++, 17.5); // Set column width to 17.5.
+    $sheet->write_string(5, $pos, get_string('grade', 'report_componentgrades'), $format2);
+    $sheet->set_column($pos, $pos++, 10); // Set column width to 10
+    $sheet->write_string(5, $pos, get_string('outof', 'report_componentgrades'), $format2);
+    $sheet->set_column($pos, $pos++, 6); // Set column width to 6
+    $sheet->write_string(5, $pos, get_string('feedback', 'report_componentgrades'), $format2);
+    $sheet->set_column($pos, $pos++, 17.5); // Set column width to 17.5
     $sheet->merge_cells(4, $pos - 1, 4, $pos);
 
     $sheet->set_row(4, 15, $format);
@@ -183,7 +189,7 @@ function report_componentgrades_add_data(MoodleExcelWorksheet $sheet, array $stu
              $sheet->write_string($row, $col++, $student->idnumber);
         }
         if (get_config('report_componentgrades', 'showgroups')) {
-            if (!is_null($groups)) {
+            if (!empty($groups)) {
                 if (isset($groups[$student->userid])) {
                     $sheet->write_string($row, $col++, implode(', ', $groups[$student->userid]));
                 } else {
@@ -198,6 +204,9 @@ function report_componentgrades_add_data(MoodleExcelWorksheet $sheet, array $stu
             } else {
                 /* if BTEC 0=N and 1=Y */
                 $sheet->write_string($row, $col++, $line->score);
+            }
+            if (is_numeric($line->maxscore)) {
+                $sheet->write_number($row, $col++, $line->maxscore);
             }
             if ($method == 'rubric') {
                 // Only rubrics have a "definition".
@@ -218,7 +227,13 @@ function report_componentgrades_add_data(MoodleExcelWorksheet $sheet, array $stu
                 $sheet->set_column($col, $col, 15);
                 $sheet->write_string($row, $col++, $line->grader);
                 $sheet->set_column($col, $col, 35);
-                $sheet->write_string($row, $col, userdate($line->modified));
+                $sheet->write_string($row, $col++, userdate($line->modified));
+                $sheet->set_column($col, $col, 13);
+                $sheet->write_number($row, $col++, round($line->grade, 2));
+                $sheet->set_column($col, $col, 8);
+                $sheet->write_number($row, $col++, $line->maxgrade);
+                $sheet->set_column($col, $col, 14);
+                $sheet->write_string($row, $col++, strip_tags($line->feedback));
             }
         }
     }

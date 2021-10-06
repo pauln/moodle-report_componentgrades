@@ -58,18 +58,18 @@ $filename = $course->shortname . ' - ' . $cm->name . '.xls';
 $data = $DB->get_records_sql("SELECT gbf.id AS ggfid, crs.shortname AS course, asg.name AS assignment, gd.name AS btec,
                                         gbc.shortname, gbf.score, gbf.remark, gbf.criterionid, marker.username AS grader,
                                         stu.id AS userid, stu.idnumber AS idnumber, stu.firstname, stu.lastname,
-                                        stu.username AS student, gin.timemodified AS modified,ag.id, ag.grade,
-                                        afc.commenttext
+                                        stu.username AS student, gin.timemodified AS modified, ag.id, ag.grade AS grade, asg.grade AS maxgrade, 
+                                        afc.commenttext AS feedback
                                 FROM {course} crs
                                 JOIN {course_modules} cm ON crs.id = cm.course
                                 JOIN {assign} asg ON asg.id = cm.instance
                                 JOIN {context} c ON cm.id = c.instanceid
-                                JOIN {grading_areas} ga ON c.id=ga.contextid
+                                JOIN {grading_areas} ga ON c.id = ga.contextid
                                 JOIN {grading_definitions} gd ON ga.id = gd.areaid
                                 JOIN {gradingform_btec_criteria}  gbc ON (gbc.definitionid = gd.id)
                                 JOIN {grading_instances} gin ON gin.definitionid = gd.id
                                 JOIN {assign_grades} ag ON ag.id = gin.itemid
-                                JOIN {assignfeedback_comments} afc on ag.id=afc.grade
+                                JOIN {assignfeedback_comments} afc on ag.id = afc.grade
                                 JOIN {user} stu ON stu.id = ag.userid
                                 JOIN {user} marker ON marker.id = gin.raterid
                                 JOIN {gradingform_btec_fillings} gbf ON (gbf.instanceid = gin.id)

@@ -57,9 +57,10 @@ $event->trigger();
 $filename = $course->shortname . ' - ' . $cm->name . '.xls';
 
 $data = $DB->get_records_sql("SELECT    ggf.id AS ggfid, crs.shortname AS course, asg.name AS assignment, gd.name AS guide,
-                                        ggc.shortname, ggf.score, ggf.remark, ggf.criterionid, rubm.username AS grader,
+                                        ggc.shortname, ggf.score, ggc.maxscore, ggf.remark, ggf.criterionid, rubm.username AS grader,
                                         stu.id AS userid, stu.idnumber AS idnumber, stu.firstname, stu.lastname,
-                                        stu.username AS student, gin.timemodified AS modified
+                                        stu.username AS student, gin.timemodified AS modified, ag.grade AS grade, asg.grade AS maxgrade, 
+                                        afc.commenttext AS feedback
                                 FROM {course} crs
                                 JOIN {course_modules} cm ON crs.id = cm.course
                                 JOIN {assign} asg ON asg.id = cm.instance
@@ -69,6 +70,7 @@ $data = $DB->get_records_sql("SELECT    ggf.id AS ggfid, crs.shortname AS course
                                 JOIN {gradingform_guide_criteria} ggc ON (ggc.definitionid = gd.id)
                                 JOIN {grading_instances} gin ON gin.definitionid = gd.id
                                 JOIN {assign_grades} ag ON ag.id = gin.itemid
+                                JOIN {assignfeedback_comments} AS afc ON ag.id = afc.grade
                                 JOIN {user} stu ON stu.id = ag.userid
                                 JOIN {user} rubm ON rubm.id = gin.raterid
                                 JOIN {gradingform_guide_fillings} ggf ON (ggf.instanceid = gin.id)
@@ -100,8 +102,10 @@ foreach ($data as $line) {
         break;
     }
     $sheet->write_string(TITLESROW, $pos, $line->shortname, $format);
-    $sheet->merge_cells(TITLESROW, $pos, 4, $pos + 1, $format);
+    $sheet->merge_cells(TITLESROW, $pos, 4, $pos + 2, $format);
     $sheet->write_string(5, $pos, get_string('score', 'report_componentgrades'), $format2);
+    $sheet->set_column($pos, $pos++, 6); // Set column width to 6.
+    $sheet->write_string(5, $pos, get_string('outof', 'report_componentgrades'), $format2);
     $sheet->set_column($pos, $pos++, 6); // Set column width to 6.
     $sheet->write_string(5, $pos, get_string('feedback', 'report_componentgrades'), $format2);
     $sheet->set_column($pos, $pos++, 10); // Set column widths to 10.
