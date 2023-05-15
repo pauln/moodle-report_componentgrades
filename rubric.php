@@ -118,7 +118,7 @@ $groups = array();
 if ($showgroups) {
     $groups = report_componentgrades_get_user_groups($course->id);
 }
-$row = report_componentgrades_add_data($sheet, $students, $gradinginfopos, 'rubric', $groups);
+report_componentgrades_add_data($sheet, $students, $gradinginfopos, 'rubric', $groups, $showgroups);
 
 $workbook->close();
 

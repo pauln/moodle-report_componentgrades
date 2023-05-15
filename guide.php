@@ -116,7 +116,7 @@ if ($showgroups) {
     $groups = report_componentgrades_get_user_groups($course->id);
 }
 
-report_componentgrades_add_data($sheet, $students, $gradinginfopos, 'guide', $groups);
+report_componentgrades_add_data($sheet, $students, $gradinginfopos, 'guide', $groups, $showgroups);
 
 $workbook->close();
 

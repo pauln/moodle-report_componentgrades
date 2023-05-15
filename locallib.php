@@ -105,10 +105,8 @@ function report_componentgrades_add_header(MoodleExcelWorkbook $workbook, Moodle
         $sheet->write_string(HEADINGSROW, $col, get_string('studentid', 'report_componentgrades'), $format2);
         $col++;
     }
-    if (get_config('report_componentgrades', 'showgroups')) {
-        if ($showgroups) {
-            $sheet->write_string(HEADINGSROW, $col++, get_string('groups'), $format2);
-        }
+    if ($showgroups) {
+        $sheet->write_string(HEADINGSROW, $col++, get_string('groups'), $format2);
     }
     $sheet->set_column(0, $col, 10); // Set column widths to 10.
 
@@ -170,7 +168,7 @@ function report_componentgrades_process_data(array $students, array $data) {
  * @param array $groups - user group information (optional).
  * @return void
  */
-function report_componentgrades_add_data(MoodleExcelWorksheet $sheet, array $students, $gradinginfopos, $method, $groups = null) {
+function report_componentgrades_add_data(MoodleExcelWorksheet $sheet, array $students, $gradinginfopos, $method, $groups = null, $showgroups = false) {
     // Actual data.
     $row = 5;
     foreach ($students as $student) {
@@ -182,13 +180,11 @@ function report_componentgrades_add_data(MoodleExcelWorksheet $sheet, array $stu
         if (get_config('report_componentgrades', 'showstudentid')) {
              $sheet->write_string($row, $col++, $student->idnumber);
         }
-        if (get_config('report_componentgrades', 'showgroups')) {
-            if (!is_null($groups)) {
-                if (isset($groups[$student->userid])) {
-                    $sheet->write_string($row, $col++, implode(', ', $groups[$student->userid]));
-                } else {
-                    $sheet->write_string($row, $col++, 'empty');
-                }
+        if ($showgroups) {
+            if (!is_null($groups) && isset($groups[$student->userid])) {
+                $sheet->write_string($row, $col++, implode(', ', $groups[$student->userid]));
+            } else {
+                $sheet->write_string($row, $col++, 'empty');
             }
         }
 
