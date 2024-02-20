@@ -1,3 +1,7 @@
+### Plugin not maintained: Feb 2024
+
+I (Marcus Green) am no longer maintaining this plugin, but there is an alternative plugin that covers a very similar functionality which can be found here https://github.com/marcusgreen/moodle-report_advancedgrading
+
 ### Version 1.4 August 2021
 Add setting and code for showgroups. Thanks to Dan Marsden for the idea and code
 
